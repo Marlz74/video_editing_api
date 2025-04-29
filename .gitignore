@@ -1,0 +1,13 @@
+node_modules/
+package-lock.json
+.env
+dist/
+coverage/
+.vscode/
+*.log
+*.tsbuildinfo
+*.tgz
+*.zip
+*.tar
+src/uploads/*
+src/processed/*

@@ -1,0 +1,215 @@
+generator client {
+  provider = "prisma-client-js",
+  output   = "./node_modules/@prisma/client"
+
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EditingSessionStatus {
+  draft
+  rendering
+  completed
+  failed
+}
+
+enum RenderJobStatus {
+  queued
+  processing
+  completed
+  failed
+}
+
+enum EditOperationType {
+  trim
+  subtitle
+  audio
+  text
+  image
+}
+
+enum EditOperationStatus {
+  pending
+  applied
+  failed
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  username      String?   @unique
+  email         String?   @unique
+  password_hash String?
+  avatar_url    String?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @default(now()) @updatedAt
+  videos        Video[]
+  shared_videos SharedVideo[]
+}
+
+model Video {
+  id               Int              @id @default(autoincrement())
+  user_id          Int?
+  user             User?            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  title            String?
+  description      String?
+  original_filename String?
+  storage_path     String?
+  thumbnail_path   String?
+  duration         Float?
+  size             BigInt?
+  mime_type        String?
+  status           String?          @default("uploaded")
+  visibility       String?          @default("public")
+  created_at       DateTime         @default(now())
+  updated_at       DateTime         @default(now()) @updatedAt
+  editing_sessions EditingSession[]
+  text_overlays    TextOverlay[]
+  subtitles        Subtitle[]
+  shared_videos    SharedVideo[]
+  rendered_videos  RenderedVideo[]
+  image_overlays   ImageOverlay[]
+  audio_tracks     AudioTrack[]
+}
+
+model EditingSession {
+  id              Int             @id @default(autoincrement())
+  video_id        Int?
+  video           Video?          @relation(fields: [video_id], references: [id], onDelete: Cascade)
+  name            String?
+  status          EditingSessionStatus @default(draft)
+  created_at      DateTime        @default(now())
+  updated_at      DateTime        @default(now()) @updatedAt
+  render_jobs     RenderJob[]
+  edit_operations EditOperation[]
+  text_overlays   TextOverlay[]
+  subtitles       Subtitle[]
+  rendered_videos RenderedVideo[]
+  image_overlays  ImageOverlay[]
+  audio_tracks    AudioTrack[]
+}
+
+model RenderJob {
+  id             Int            @id @default(autoincrement())
+  session_id     Int?
+  session        EditingSession? @relation(fields: [session_id], references: [id], onDelete: Cascade)
+  status         RenderJobStatus @default(queued)
+  progress       Float          @default(0)
+  error_message  String?
+  job_id         String?
+  priority       Int            @default(0)
+  started_at     DateTime?
+  completed_at   DateTime?
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @default(now()) @updatedAt
+}
+
+model EditOperation {
+  id              Int            @id @default(autoincrement())
+  session_id      Int?
+  session         EditingSession? @relation(fields: [session_id], references: [id], onDelete: Cascade)
+  operation_type  EditOperationType
+  sequence_order  Int
+  params          Json?
+  status          EditOperationStatus @default(pending)
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @default(now()) @updatedAt
+}
+
+model TextOverlay {
+  id              Int            @id @default(autoincrement())
+  video_id        Int?
+  video           Video?         @relation(fields: [video_id], references: [id], onDelete: Cascade)
+  session_id      Int?
+  session         EditingSession? @relation(fields: [session_id], references: [id], onDelete: Cascade)
+  text            String?
+  start_time      Float?
+  end_time        Float?
+  position_x      Float?
+  position_y      Float?
+  style           Json?
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @default(now()) @updatedAt
+}
+
+model Subtitle {
+  id              Int            @id @default(autoincrement())
+  video_id        Int?
+  video           Video?         @relation(fields: [video_id], references: [id], onDelete: Cascade)
+  session_id      Int?
+  session         EditingSession? @relation(fields: [session_id], references: [id], onDelete: SetNull)
+  text            String?
+  start_time      Float?
+  end_time        Float?
+  position        String?        @default("bottom")
+  style           Json?
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @default(now()) @updatedAt
+}
+
+model SharedVideo {
+  id            Int       @id @default(autoincrement())
+  video_id      Int?
+  video         Video?    @relation(fields: [video_id], references: [id], onDelete: Cascade)
+  user_id       Int?
+  user          User?     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  share_token   String?   @unique
+  expires_at    DateTime?
+  access_count  Int       @default(0)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @default(now()) @updatedAt
+}
+
+model RenderedVideo {
+  id                 Int            @id @default(autoincrement())
+  session_id         Int?
+  session            EditingSession? @relation(fields: [session_id], references: [id], onDelete: Cascade)
+  video_id           Int?
+  video              Video?         @relation(fields: [video_id], references: [id], onDelete: Cascade)
+  storage_path       String?
+  size               BigInt?
+  duration           Float?
+  resolution         String?
+  status             String?        @default("rendering")
+  render_started_at  DateTime?
+  render_completed_at DateTime?
+  download_count     Int            @default(0)
+  created_at         DateTime       @default(now())
+  updated_at         DateTime       @default(now()) @updatedAt
+}
+
+model ImageOverlay {
+  id              Int            @id @default(autoincrement())
+  video_id        Int?
+  video           Video?         @relation(fields: [video_id], references: [id], onDelete: Cascade)
+  session_id      Int?
+  session         EditingSession? @relation(fields: [session_id], references: [id], onDelete: Cascade)
+  storage_path    String?
+  start_time      Float?
+  end_time        Float?
+  position_x      Float?
+  position_y      Float?
+  width           Float?
+  height          Float?
+  opacity         Float          @default(1.0)
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @default(now()) @updatedAt
+}
+
+model AudioTrack {
+  id              Int            @id @default(autoincrement())
+  video_id        Int?
+  video           Video?         @relation(fields: [video_id], references: [id], onDelete: Cascade)
+  session_id      Int?
+  session         EditingSession? @relation(fields: [session_id], references: [id], onDelete: Cascade)
+  name            String?
+  storage_path    String?
+  duration        Float?
+  volume          Float          @default(1.0)
+  start_time      Float          @default(0)
+  is_original     Boolean        @default(false)
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @default(now()) @updatedAt
+}
