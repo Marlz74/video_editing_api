@@ -27,6 +27,10 @@ A Node.js-based REST API for uploading, editing, rendering, and managing videos.
 - **Swagger Documentation**: Available at `/api-docs`.
 - **Prisma ORM**: PostgreSQL database management.
 - **Redis Queue**: BullMQ for job queue.
+- **Swagger Documentation**: Available at `/api-docs`.
+- **Swagger Documentation**: Interactive API docs available [here](http://localhost:3000/api-docs/#/) when running locally.
+
+
 
 ## Technologies
 - **Node.js**
