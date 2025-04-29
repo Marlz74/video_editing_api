@@ -1,4 +1,3 @@
-```
 # Video Editing Platform Backend
 
 A Node.js-based REST API for uploading, editing, rendering, and managing videos. The platform supports video uploads, trimming, subtitle addition, rendering with FFmpeg, and downloading rendered videos. It includes features like render job status tracking and paginated video retrieval, with robust error handling and Swagger documentation.
@@ -36,7 +35,7 @@ A Node.js-based REST API for uploading, editing, rendering, and managing videos.
 - **Redis**
 - **FFmpeg**
 - **BullMQ**
-- **Swagger (swagger-jsdoc, swagger-ui-express)**
+- **Swagger** (`swagger-jsdoc`, `swagger-ui-express`)
 - **Multer**
 - **Nodemon**
 
@@ -51,9 +50,9 @@ A Node.js-based REST API for uploading, editing, rendering, and managing videos.
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/Marlz74/fallon_video_api.git
+   git clone https://github.com/Marlz74/video_editing_api.git
    cd fallon_video_api
-   ```
+
 
 2. **Install Dependencies**:
    ```bash
