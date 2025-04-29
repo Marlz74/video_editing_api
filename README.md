@@ -1,8 +1,4 @@
-Your markdown documentation is solid and comprehensive. Below is a **cleaned-up and properly formatted version** to improve readability and fix indentation and syntax inconsistencies—especially under the **Setup Instructions**, **Environment Variables**, and **API Endpoints** sections.
-
----
-
-```markdown
+```
 # Video Editing Platform Backend
 
 A Node.js-based REST API for uploading, editing, rendering, and managing videos. The platform supports video uploads, trimming, subtitle addition, rendering with FFmpeg, and downloading rendered videos. It includes features like render job status tracking and paginated video retrieval, with robust error handling and Swagger documentation.
